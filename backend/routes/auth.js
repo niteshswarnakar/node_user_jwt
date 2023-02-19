@@ -18,8 +18,9 @@ const loginSchema = Joi.object({
   password: Joi.string().min(6).required(),
 });
 
-router.get("/", (req, res) => {
-  res.send("hello auth route reached");
+router.get("/", async (req, res) => {
+  const users = await User.find();
+  res.status(200).json({users})
 });
 
 router.post("/register", async (req, res) => {
@@ -50,10 +51,10 @@ router.post("/register", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   const user = await User.findOne({ email: req.body.email });
-  if (!user) return res.status(400).send("credentials milena yr");
+  if (!user) return res.status(400).send("credentials milena");
 
   const validPassword = await bcrypt.compare(req.body.password, user.password);
-  if (!validPassword) return res.status(400).send("password milena yr");
+  if (!validPassword) return res.status(400).send("password milena");
   try {
     const { error } = loginSchema.validateAsync(req.body);
     if (error) return res.status(400).send(error);
